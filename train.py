@@ -2,9 +2,9 @@ import torch
 import os
 import time
 from torch.utils.data import DataLoader
-from JAMSNet.model.JAMSNet import JAMSNet
-from JAMSNet.Dataset.LoadDataset import LoadDataset
-from JAMSNet.loss.loss import cal_negative_pearson
+from model.JAMSNet import JAMSNet
+from Dataset.LoadDataset import LoadDataset
+from loss.loss import cal_negative_pearson
 
 
 def train(model_to_train, num_batch, dataset_loader, optimizer):
