@@ -20,13 +20,19 @@ def train(model_to_train, num_batch, dataset_loader, optimizer):
         stRep_2 = batch_data[2]
         gtPPG = batch_data[3]
         gtPPG = gtPPG.squeeze(0)       # 150 1
-        stRep_0 = stRep_0.squeeze(0).permute(3, 2, 0, 1)   # 150 3 192 128
-        stRep_1 = stRep_1.squeeze(0).permute(3, 2, 0, 1)   # 150 3 96 64
-        stRep_2 = stRep_2.squeeze(0).permute(3, 2, 0, 1)   # 150 3 48 32
+        # stRep_0 = stRep_0.squeeze(0).permute(3, 2, 0, 1)   # 150 3 192 128
+        # stRep_1 = stRep_1.squeeze(0).permute(3, 2, 0, 1)   # 150 3 96 64
+        # stRep_2 = stRep_2.squeeze(0).permute(3, 2, 0, 1)   # 150 3 48 32
+        
+        stRep_0 = stRep_0.squeeze(0).permute(0, 3, 1, 2) 
+        stRep_1 = stRep_1.squeeze(0).permute(0, 3, 1, 2)  
+        stRep_2 = stRep_2.squeeze(0).permute(0, 3, 1, 2) 
+        
         stRep_0 = stRep_0.to(device)
         stRep_1 = stRep_1.to(device)
         stRep_2 = stRep_2.to(device)
         gtPPG = gtPPG.to(device)
+        
         stRep_pred_L = model_to_train(stRep_0, stRep_1, stRep_2)
         loss = cal_negative_pearson(stRep_pred_L, gtPPG)
         optimizer.zero_grad()

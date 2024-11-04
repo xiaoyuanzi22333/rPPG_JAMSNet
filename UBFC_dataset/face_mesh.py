@@ -12,7 +12,7 @@ CHIN_POINT = 152      # 下巴
 LEFT_EAR_POINT = 234  # 左耳
 RIGHT_EAR_POINT = 454 # 右耳
 
-video_path = "./DATASET_1/5-gt/vid.avi"
+video_path = "./DATASET_1_raw/5-gt/vid.avi"
 cap = cv2.VideoCapture(video_path)
 
 # 设置 Face Mesh 模型参数

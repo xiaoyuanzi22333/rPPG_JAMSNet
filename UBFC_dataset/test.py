@@ -1,23 +1,19 @@
 import cv2
 import numpy as np
 
+file = np.load('./DATASET_2/train/subject1/video_0/rep_0.npy')
+file_1 = np.load('./DATASET_2/train/subject1/video_0/rep_1.npy')
+file_2 = np.load('./DATASET_2/train/subject3/video_0/rep_2.npy')
+file_gt = np.load('./DATASET_2/train/subject1/video_0/gtTrace.npy')
 
-v1 = './DATASET_2_transform/subject8/video_7/vid.avi'
-v2 = './DATASET_2_transform/subject8/video_0/vid.avi'
+file = np.array(file)
+file_1 = np.array(file_1)
+file_2 = np.array(file_2)
+file_gt = np.array(file_gt)
+file_gt.resize((150,1))
 
-gttrace = './DATASET_2_transform/subject8/video_0/gtHR.npy'
+print(file.shape)
+print(file_1.shape)
+print(file_2.shape)
+print(file_gt.shape)
 
-
-# cap1 = cv2.VideoCapture(v1)
-# cap2 = cv2.VideoCapture(v2)
-
-# succ1,frame1 = cap1.read()
-# succ2,frame2 = cap2.read()
-
-# # print(frame1)
-
-# cv2.imwrite('./frame1.jpg', frame1)
-# cv2.imwrite('./frame2.jpg', frame2)
-
-trace = np.load(gttrace)
-print(trace)

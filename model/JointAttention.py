@@ -19,7 +19,7 @@ class CTJA (nn.Module):
         T_C = x.size(1) * x.size(2)
         W_H = x.size(3) * x.size(4)
         x_0 = x.view(1, x.size(1), x.size(2), 1, W_H)
-        x_0 = x_0.view(1, T_C, 1, 1, W_H)
+        x_0 = x_0.contiguous().view(1, T_C, 1, 1, W_H)
         x_mean = torch.mean(x, 3, True)
         x_mean = torch.mean(x_mean, 4, True)
         x_mean = x_mean.permute(0, 4, 3, 1, 2)

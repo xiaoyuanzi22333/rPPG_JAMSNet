@@ -296,8 +296,8 @@ def haar_klt(video_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    # path = './DATASET_1/5-gt/vid.avi'
-    path = './DATASET_2/subject/vid.avi'
+    # path = './DATASET_1_raw/5-gt/vid.avi'
+    path = './DATASET_2_raw/subject/vid.avi'
     
     haar = Process(target=haar_baseline, args=(path,))
     mediapipe = Process(target=mediapipe_baseline, args=(path,))

@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("-num", "--number", type=int)
     args = parser.parse_args()    
 
-    path_test = './DATASET_2/subject' + str(args.number)
+    path_test = './DATASET_2_raw/subject' + str(args.number)
     data = UBFC2_data(path_test)
     
     videoPath = data.getVideo()

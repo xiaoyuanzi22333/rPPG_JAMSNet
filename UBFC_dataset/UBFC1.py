@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser.add_argument("-num", type=int)
     args = parser.parse_args()
     
-    data = UBFC1_data('./DATASET_1/' + str(args.num) + '-gt')
+    data = UBFC1_data('./DATASET_1_raw/' + str(args.num) + '-gt')
     videoPath = data.getVideo()
     time, trace, hr = data.getGT()
     
