@@ -65,12 +65,12 @@ def mediapipe_baseline(data: UBFC2_data, subject_tgt_pth, generate=True):
                     
     # generate 150width and 30fps small video if generate=True
     cap.release()
-    for i in range(int(len(video_crop)/150)):
+    for i in range(int((len(video_crop)-150)/30)):
         crop_video_folder_pth = os.path.join(subject_tgt_pth, 'video_'+str(i))
         if not os.path.exists(crop_video_folder_pth):
             os.mkdir(crop_video_folder_pth)
         
-        video_generate = video_crop[i:i+150]
+        video_generate = video_crop[30*i:30*i+150]
         crop_video_pth = os.path.join(crop_video_folder_pth,'vid.avi')
         
         if generate:
@@ -85,8 +85,8 @@ def mediapipe_baseline(data: UBFC2_data, subject_tgt_pth, generate=True):
                 videoWriter.write(img)
             videoWriter.release()
             gtTrace, gtHR = data.getGT()
-            np.save(crop_video_folder_pth+'/gtTrace.npy',gtTrace[i:i+150])
-            np.save(crop_video_folder_pth+'/gtHR', gtHR[i:i+150])
+            np.save(crop_video_folder_pth+'/gtTrace.npy',gtTrace[30*i:30*i+150])
+            np.save(crop_video_folder_pth+'/gtHR', gtHR[30*i:30*i+150])
         
 
 def guassian_pyrimid(src):
@@ -104,8 +104,8 @@ def guassian_pyrimid(src):
     # 定义视频编解码器并创建VideoWriter对象
     fourcc = cv2.VideoWriter_fourcc(*'XVID')
     
-    out_1 = cv2.VideoWriter(src + '/vid_1.avi', fourcc, fps, (width, height))
-    out_2 = cv2.VideoWriter(src + '/vid_2.avi', fourcc, fps, (width, height))
+    out_1 = cv2.VideoWriter(src + '/vid_1.avi', fourcc, fps, (int(width/2), int(height/2)))
+    out_2 = cv2.VideoWriter(src + '/vid_2.avi', fourcc, fps, (int(width/4), int(height/4)))
 
     rep_0 = []
     rep_1 = []
@@ -123,12 +123,14 @@ def guassian_pyrimid(src):
 
         # 1
         gaussian_pyramid = cv2.pyrDown(gaussian_pyramid)
+        print(gaussian_pyramid.shape)
         # gaussian_pyramid = cv2.resize(gaussian_pyramid, (width, height))
         rep_1.append(gaussian_pyramid)
         out_1.write(gaussian_pyramid)
 
         # 2
         gaussian_pyramid = cv2.pyrDown(gaussian_pyramid)
+        print(gaussian_pyramid.shape)
         # gaussian_pyramid = cv2.resize(gaussian_pyramid, (width, height))
         rep_2.append(gaussian_pyramid)
         out_2.write(gaussian_pyramid)
@@ -145,6 +147,8 @@ def guassian_pyrimid(src):
 
 
 def transfrom():
+    if not os.path.exists(tgt_pth):
+        os.mkdir(tgt_pth)
     for file_name in tqdm(os.listdir(src_pth)):
         
         # create subject folder for each dataset
@@ -163,9 +167,12 @@ def transfrom():
 if __name__ == "__main__":
         
     # transfrom()
+    
     for file_name in tqdm(os.listdir(tgt_pth)):
         subject_tgt_path = os.path.join(tgt_pth, file_name)
         for item in os.listdir(subject_tgt_path):
             item_tgt_path = os.path.join(subject_tgt_path,item)
             guassian_pyrimid(item_tgt_path)
     print("transformed")
+    
+    # guassian_pyrimid('./DATASET_2_transform/subject1/video_0')
