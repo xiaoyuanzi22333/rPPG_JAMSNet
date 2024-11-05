@@ -1,14 +1,13 @@
 from UBFC2 import UBFC2_data
 import cv2
 import numpy as np
-import pandas as pd
 import os
 import mediapipe as mp
 from tqdm import tqdm
 
 
 src_pth = './DATASET_2_raw'
-tgt_pth = './DATASET_2_transform'
+tgt_pth = './DATASET_2_transform/train'
 
 # 初始化 Mediapipe 的 Face Mesh 模型
 mp_face_mesh = mp.solutions.face_mesh

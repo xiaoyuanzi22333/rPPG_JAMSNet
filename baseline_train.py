@@ -1,7 +1,5 @@
 import torch
 import os
-import numpy as np
-import cv2
 import time
 from torch.utils.data import DataLoader
 from model.JAMSNet import JAMSNet
@@ -17,7 +15,7 @@ def train(model_to_train, num_batch, dataset_loader, optimizer):
     running_loss = 0.0
     cnt = 1
     total_loss = 0.0
-    num_batch_show = 100
+    num_batch_show = 500
     for i, batch_data in enumerate(tqdm(dataset_loader)):
 
         stRep_0 = batch_data[0]
@@ -26,13 +24,6 @@ def train(model_to_train, num_batch, dataset_loader, optimizer):
         gtPPG = batch_data[3]
         gtPPG = gtPPG.squeeze(0)       # 150 1
         
-        # if i == 50:
-        #     img = np.array(stRep_0)
-        #     print(img.shape)
-        #     print(gtPPG.shape)
-        #     cv2.imwrite('img_100.jpg',img.squeeze(0)[0]*256)
-        #     exit()
-        
         # stRep_0 = stRep_0.squeeze(0).permute(3, 2, 0, 1)   # 150 3 192 128
         # stRep_1 = stRep_1.squeeze(0).permute(3, 2, 0, 1)   # 150 3 96 64
         # stRep_2 = stRep_2.squeeze(0).permute(3, 2, 0, 1)   # 150 3 48 32
@@ -40,8 +31,6 @@ def train(model_to_train, num_batch, dataset_loader, optimizer):
         stRep_0 = stRep_0.squeeze(0).permute(0, 3, 1, 2) 
         stRep_1 = stRep_1.squeeze(0).permute(0, 3, 1, 2)  
         stRep_2 = stRep_2.squeeze(0).permute(0, 3, 1, 2) 
-        
-        
         
         # output the tensor shape
         # print(gtPPG.shape)
@@ -129,7 +118,7 @@ if __name__ == '__main__':
     running_loss = 0
     dataset = 'PURE_pyramid_data'
     modelName = 'JAMSNet'
-    learning_rate = 1e-3
+    learning_rate = 1e-4
     resume_epoch = 0
     
     
@@ -144,7 +133,7 @@ if __name__ == '__main__':
     val_loader = DataLoader(val_dataset, shuffle=True, num_workers=workers)
 
     optimizer = torch.optim.Adam(model.parameters(),
-                                 lr=learning_rate)
+                                 lr=learning_rate, weight_decay=0.000)
 
     if resume_epoch == 0:
         print("Training {} from scratch...".format(modelName))
@@ -159,9 +148,69 @@ if __name__ == '__main__':
     num_batch_train = len(train_dataset)
     num_batch_val = len(val_dataset)
     for epoch in range(resume_epoch, nEpochs):
-
+        
+        num_batch = len(train_dataset)
         print("Training model {} epoch {} ...".format(modelName, epoch+1))
-        trn_loss, trn_time = train(model, num_batch_train, train_loader, optimizer)
+        start = time.time()
+        running_loss = 0.0
+        cnt = 1
+        total_loss = 0.0
+        num_batch_show = 100
+        for i, batch_data in enumerate(tqdm(train_loader)):
+
+            stRep_0 = batch_data[0]
+            stRep_1 = batch_data[1]
+            stRep_2 = batch_data[2]
+            gtPPG = batch_data[3]
+            gtPPG = gtPPG.squeeze(0)       # 150 1
+            
+            # stRep_0 = stRep_0.squeeze(0).permute(3, 2, 0, 1)   # 150 3 192 128
+            # stRep_1 = stRep_1.squeeze(0).permute(3, 2, 0, 1)   # 150 3 96 64
+            # stRep_2 = stRep_2.squeeze(0).permute(3, 2, 0, 1)   # 150 3 48 32
+            
+            stRep_0 = stRep_0.squeeze(0).permute(0, 3, 1, 2) 
+            stRep_1 = stRep_1.squeeze(0).permute(0, 3, 1, 2)  
+            stRep_2 = stRep_2.squeeze(0).permute(0, 3, 1, 2) 
+            
+            # output the tensor shape
+            # print(gtPPG.shape)
+            # print(stRep_0.shape)
+            # print(stRep_1.shape)
+            # print(stRep_2.shape)
+            # exit()
+            
+            stRep_0 = stRep_0.to(device)
+            stRep_1 = stRep_1.to(device)
+            stRep_2 = stRep_2.to(device)
+            gtPPG = gtPPG.to(device)
+            
+            stRep_pred_L = model(stRep_0, stRep_1, stRep_2)
+            loss = cal_negative_pearson(stRep_pred_L, gtPPG)
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            # Print status
+            running_loss += loss.item()
+            total_loss += loss.item()
+            cnt = cnt + 1
+
+            if i % num_batch_show == num_batch_show - 1:
+                print('[Epoch: %d, Sample: %3d/%3d] loss: %.3f' %
+                    (epoch + 1, i + 1, num_batch, running_loss / cnt))
+                running_loss = 0.0
+                cnt = 0.0
+            if i == num_batch - 1:     #
+                print('[Epoch: %d, Sample: %3d/%3d] loss: %.3f' %
+                    (epoch + 1, i + 1, num_batch, running_loss / cnt))
+                running_loss = 0.0
+                cnt = 0.0
+
+        end = time.time()
+        
+        trn_loss = total_loss / num_batch
+        trn_time = (end - start) / 60
+        
         print("train mean loss:", trn_loss)
         # add scalar: train loss
         writer.add_scalar("train_loss/epoch", trn_loss, epoch)
