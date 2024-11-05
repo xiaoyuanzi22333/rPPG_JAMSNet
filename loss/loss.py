@@ -1,5 +1,5 @@
 import torch
-
+import numpy as np
 
 def cal_negative_pearson(x, y):
     " Negative Pearson loss function, x is the predicted value, y is the true value "

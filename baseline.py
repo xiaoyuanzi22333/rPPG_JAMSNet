@@ -157,6 +157,7 @@ if __name__ == '__main__':
     
 
     num_batch_train = len(train_dataset)
+    print(num_batch_train)
     num_batch_val = len(val_dataset)
     for epoch in range(resume_epoch, nEpochs):
 
